@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="#dcdde1"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="200dp"
+        android:id="@+id/image"
+        android:layout_marginTop="50dp"
+        android:layout_height="200dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="2dp"
+        android:src="@drawable/school_bus"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:textSize="18sp"
+            android:text="Enter your child(ren)'s School ID"
+            android:textAlignment="center"/>
+
+        <EditText
+            android:id="@+id/etschoolname"
+            android:layout_width="match_parent"
+            android:text="TMS"
+            android:layout_height="55dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:ems="10"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp"
+            android:paddingLeft="20dp"
+            android:hint="School ID"
+            android:textAlignment="center"
+            android:background="@drawable/rounded_border_edittexttwo" />
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/next"
+            android:background="@drawable/circle"
+            android:src="@drawable/ic_right"/>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>
