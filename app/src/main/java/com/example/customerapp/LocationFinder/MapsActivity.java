@@ -90,12 +90,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String schoolid, studentid, schoolName;
     String pdlatitude, pdlongitude;
     String LocationUrl = Constant.BASE_URL+"selectlocation/";
-    Marker m = null;
+
     ArrayList<String> pdLat= new ArrayList<String>();
     ArrayList<String> pdLng= new ArrayList<String>();
-    List<MarkerOptions> markers = new ArrayList<MarkerOptions>();
-    LatLng studentPDLocation = null;
-    LatLng schoolLocation = null;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,21 +111,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String driverId = sharedPreferences.getString("driver_id", "");
         String schoolLat = sharedPreferences.getString("schoolLat", "");
         String schoolLng = sharedPreferences.getString("schoolLng", "");
-        String studentpdLat = sharedPreferences.getString("pd_lat", "");
-        String studentpdLng = sharedPreferences.getString("pd_lng", "");
+        String pdLat = sharedPreferences.getString("pd_lat", "");
+        String pdLng = sharedPreferences.getString("pd_lng", "");
         System.out.println("School name is : "+schoolName+", Driver Id is : "+driverId);
 
         //PickDrop Location
-        double studentPDLatitude = Double.parseDouble(studentpdLat);
-        double studentPDLongitude = Double.parseDouble(studentpdLng);
-        studentPDLocation = new LatLng(studentPDLatitude, studentPDLongitude);
+        double pdLatitude = Double.parseDouble(pdLat);
+        double pdLongitude = Double.parseDouble(pdLng);
+        final LatLng pdLocation = new LatLng(pdLatitude, pdLongitude);
 
-        newLatitude = String.valueOf(studentPDLatitude);
+        newLatitude = String.valueOf(pdLatitude);
 
         //School Location
         double schoolLatitude = Double.parseDouble(schoolLat);
         double schoolLongitude = Double.parseDouble(schoolLng);
-        schoolLocation = new LatLng(schoolLatitude, schoolLongitude);
+        final LatLng schoolLocation = new LatLng(schoolLatitude, schoolLongitude);
 
         SupportMapFragment mapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.maps);
         if (mapFragment != null) {
@@ -148,14 +147,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 pdlatitude = jsonObject.getString("pdloc_latitude");
                                 pdlongitude = jsonObject.getString("pdloc_longitude");
                                 location = jsonObject.getString("pdloc_name");
-                                MarkerOptions MarkerOptions = new MarkerOptions()
+                                mMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(Double.parseDouble(pdlatitude), Double.parseDouble(pdlongitude)))
                                         .title(location)
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
-                                mMap.addMarker(MarkerOptions);
-                                markers.add(MarkerOptions);
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
                                 mMap.addMarker(new MarkerOptions().position(schoolLocation).title("School").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(studentPDLatitude, studentPDLongitude), 13f));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pdLatitude, pdLongitude), 13f));
 
                             }
                         } catch (JSONException e) {
@@ -179,15 +176,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         request.setRetryPolicy(policy);
         requestQueue.add(request);
 
-        String url = getDirectionsURL(studentPDLocation, schoolLocation);
+        String url = getDirectionsURL(pdLocation, schoolLocation);
         DownloadTask downloadTask = new DownloadTask();
 
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
-
-    }
-
-    private void getRoute(){
 
     }
 
@@ -200,38 +193,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                getLocation();
             }
         }, 5000);
-    }
-
-
-    private String updateDirectionsURL(LatLng origin, LatLng dest){
-        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-        String dynamicwaypoint = "";
-        for (int i=0;i<pdLat.size(); i++){
-            if (pdLat.contains(newLatitude)){
-                dynamicwaypoint += pdLat.get(i)+","+pdLng.get(i)+"|";
-                break;
-            }
-
-            System.out.println(dynamicwaypoint);
-        }
-
-        System.out.println(dynamicwaypoint);
-        String waypoints = "waypoints=optimize:true|" + dynamicwaypoint;
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
-        String sensor = "sensor=false";
-        String mode = "mode=driving";
-        // Building the parameters to the web service
-        String parameters = str_origin  + "&" + waypoints + "&" + str_dest + "&" + sensor + "&" + mode + "&key=AIzaSyDShQDPYnwYVM242B9dqFVD0jL5cGiRG4s";
-
-        // Output format
-        String output = "json";
-
-        // Building the url to the web service
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-
-
-        return url;
-
     }
 
     private String getDirectionsURL(LatLng origin, LatLng dest){
@@ -316,7 +277,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Double lng = Double.parseDouble(newLongitude);
             LatLng latLng = new LatLng(lat, lng);
             mMap.addMarker(new MarkerOptions().position(latLng).title("I'm Here"));
-            Marker m1 = (Marker) m.getTag();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, 17);
             mMap.animateCamera(location);
@@ -324,23 +284,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void addmarkerToMap(String newLat, String newLng) {
-
-        if(m!=null){
-            int i= 0;
-            mMap.clear();
-            for(MarkerOptions mo : markers){
-
-                mMap.addMarker(mo);
-                System.out.println(" Looping "+i);
-                i++;
-            }
-            String url = updateDirectionsURL(studentPDLocation, schoolLocation);
-            DownloadTask downloadTask = new DownloadTask();
-
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
-        }
-
         double lat = Double.parseDouble(newLat);
         double lng = Double.parseDouble(newLng);
         LatLng latLng = new LatLng(lat, lng);
@@ -349,11 +292,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.school_bus_marker);
         BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(img);
         markerOptions.icon(descriptor);
-        m = mMap.addMarker(markerOptions);
-
+        mMap.addMarker(markerOptions);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-//        mMap.animateCamera(location);
+        mMap.animateCamera(location);
         new Handler().postDelayed(() -> {
             getLocation();
         }, 10000);
